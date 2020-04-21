@@ -6,6 +6,145 @@
     <title>Real world fetch</title>
   </head>
   <body>
-    <script></script>
+    <form>
+      <input type="text" id="name" />
+      <input type="text" id="surname" />
+      <button type="submit">submit</button>
+    </form>
+
+    <h2>Pokemon Search</h2>
+    <form id="pikachu">
+      <label for="pokemon-input">Pokemon Name</label>
+      <input type="search" id="inputPikachu" name="input-pikachu" />
+      <button type="submit">Search</button>
+      <output></output>
+    </form>
+
+    <script>
+      //challange 1: nothing is seen..
+      fetch("/njagnja")
+        .then((response) => console.log(response))
+        .catch((error) => console.log(error));
+
+      //challange 2
+      fetch("/njagnja")
+        .then((response) => {
+          if (!response.ok) throw new Error(response.status);
+          console.log(response);
+        })
+        .catch(console.error);
+
+      //challange 3: post method
+      const data = { id: 3 };
+      fetch("https://reqres.in/api/users", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "content-type": "application/json" },
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error(response.status);
+          return response.json();
+        })
+        .then((json) => console.log(json))
+        .catch((error) => console.error(error));
+
+      //challange 4: form preventDefault
+      let form = document.querySelector("form");
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        let name = document.querySelector("#name").value;
+        let surname = document.querySelector("#surname").value;
+        const data = { name, surname };
+        fetch("https://reqres.in/api/users", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "content-type": "application/json" },
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error(response.status);
+            return response.json();
+          })
+          .then((json) => console.log(json))
+          .catch((error) => console.error(error));
+      });
+
+      //challange 5: event.target.elements
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        let name = event.target.elements.name.value;
+        let surname = event.target.elements.surname.value;
+        let info = { name, surname };
+        fetch("https://reqres.in/api/users", {
+          method: "POST",
+          body: JSON.stringify(info),
+          headers: { "content-type": "application/json" },
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error(response.status);
+            return response.json();
+          })
+          .then((json) => console.log(json))
+          .catch((error) => console.error(error));
+      });
+
+      //challange 6: new formData
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        let formData = new FormData(event.target);
+        let data = Object.fromEntries(formData);
+        fetch("https://reqres.in/api/users", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "content-type": "application/json" },
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error(response.status);
+            return response.json();
+          })
+          .then((json) => console.log(json))
+          .catch((error) => console.error(error));
+      });
+
+      //Pokemon Search
+
+      let formPikachu = document.getElementById("pikachu");
+      let output = document.querySelector("output");
+      //prevent reloading the window
+      formPikachu.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        // do not create same results again and again
+        output.innerHTML = "";
+
+        //get the value
+        let formDataPikachu = new FormData(event.target);
+        let inputPikachu = formDataPikachu.get("input-pikachu");
+
+        fetch(`https://pokeapi.co/api/v2/pokemon/${inputPikachu}`)
+          .then((response) => {
+            if (!response.ok) throw new Error(response.status);
+            return response.json();
+          })
+          .then((pikachuData) => {
+            let heading = document.createElement("h2");
+            heading.textContent = pikachuData.inputPikachu;
+            const image = document.createElement("img");
+            image.src = pikachuData.sprites.front_default;
+            image.alt = "";
+
+            output.appendChild(heading);
+            output.appendChild(image);
+          })
+          // if it is unsuccessful
+          .catch((error) => {
+            console.log(error);
+            if (error.message === "404") {
+              output.textContent = `⚠️ Couldn't find "${inputPikachu}"`;
+            } else {
+              output.textContent = "⚠️ Something went wrong";
+            }
+          });
+      });
+    </script>
   </body>
 </html>
