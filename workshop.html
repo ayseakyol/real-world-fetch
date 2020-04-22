@@ -127,7 +127,7 @@
           })
           .then((pikachuData) => {
             let heading = document.createElement("h2");
-            heading.textContent = pikachuData.inputPikachu;
+            heading.textContent = pikachuData.name;
             const image = document.createElement("img");
             image.src = pikachuData.sprites.front_default;
             image.alt = "";
